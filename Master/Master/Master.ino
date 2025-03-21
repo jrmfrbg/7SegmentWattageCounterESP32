@@ -20,7 +20,8 @@ void loop() {
         Serial.println("Taster gedrückt!");
 
         HTTPClient http;
-        http.begin("http://esp-slave.local/toggleLED");
+        http.begin("http://esp-slaveTotalWattage.local/toggleLED");
+        http.begin("http://esp-slaveCurrentWattage.local/toggleLED");
         int httpResponseCode = http.GET();
         http.end();
 

@@ -32,10 +32,10 @@ void setup() {
     Serial.print("IP-Adresse: ");
     Serial.println(WiFi.localIP());
 
-    if (!MDNS.begin("esp-slave")) {
+    if (!MDNS.begin("esp-slaveCurrentWattage")) {
         Serial.println("Fehler beim Start von mDNS!");
     } else {
-        Serial.println("mDNS-Dienst gestartet: esp-slave.local");
+        Serial.println("mDNS-Dienst gestartet: esp-slaveCurrentWattage.local");
     }
 
     server.begin();
