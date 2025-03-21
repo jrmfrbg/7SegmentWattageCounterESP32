@@ -4,9 +4,19 @@
 
 const char *ssid = "BalkonSolarDisplay";
 const char *password = "12345678";
-
+int totalWattage = 0;
 const int ledPin = 3;
 WiFiServer server(80);
+
+void ledPrintTotalWattage() {
+  for (int i = 0; i < totalWattage; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(250);
+    digitalWrite(ledPin, LOW);
+    delay(250);
+  }
+}
+
 
 void setup() {
     Serial.begin(115200);
@@ -38,10 +48,10 @@ void loop() {
         client.flush();
 
         if (request.indexOf("GET /toggleLED") >= 0) {
-            Serial.println("Signal empfangen!");
-            digitalWrite(ledPin, HIGH);
-            delay(500);
-            digitalWrite(ledPin, LOW);
+            totalWattage++;
+            Serial.println("totalWattage=");
+            Serial.println(totalWattage);
+            ledPrintTotalWattage();
         }
 
         client.stop();
