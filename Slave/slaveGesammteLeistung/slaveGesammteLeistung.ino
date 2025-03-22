@@ -21,13 +21,15 @@ void ledPrintTotalWattage() {
 void setup() {
     Serial.begin(115200);
     pinMode(ledPin, OUTPUT);
-
     // WLAN-Verbindung zum AP herstellen
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
     }
+    digitalWrite(ledPin, HIGH);
+    delay(250);
+    digitalWrite(ledPin, LOW);
     Serial.println("\nVerbunden!");
     Serial.print("IP-Adresse: ");
     Serial.println(WiFi.localIP());
