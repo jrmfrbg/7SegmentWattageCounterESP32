@@ -25,8 +25,15 @@ void registerWattUsage() {
     Serial.print("Aktuelle Watt/h: ");
     float currentWattPerHour = currentWattPerSecond * 3600.0;
     Serial.println(currentWattPerHour);
-    lastResetTime = millis();
-    wattCount = 0;
+    Serial.print("wattCount: ");
+    Serial.print(wattCount);
+    Serial.print(", Last reset Time: ");
+    Serial.print(lastResetTime);
+    if (wattCount > 3) {
+      lastResetTime = millis();
+      wattCount = 0;
+    }
+    
 }
 
 void setup() {
