@@ -21,10 +21,11 @@ void setup() {
     Serial.begin(115200);
     pinMode(buttonPin, INPUT_PULLUP);
     pinMode(ledPin, OUTPUT);
-    startupBlinkLED();
+    
 
     WiFi.softAP(ssid, password);
     Serial.println("Access Point gestartet");
+    startupBlinkLED();
 }
 
 void loop() {

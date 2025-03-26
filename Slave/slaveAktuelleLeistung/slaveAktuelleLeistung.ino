@@ -8,8 +8,10 @@ const int ledPin = 3;
 WiFiServer server(80);
 unsigned long lastResetTime = millis();
 int wattCount = 0;
+bool notFirstWatt;
 
 void registerWattUsage() {
+  if (notFirstWatt) {
     digitalWrite(ledPin, HIGH);
     delay(500);
     digitalWrite(ledPin, LOW);
@@ -29,11 +31,14 @@ void registerWattUsage() {
     Serial.print(wattCount);
     Serial.print(", Last reset Time: ");
     Serial.print(lastResetTime);
-    if (wattCount > 3) {
-      lastResetTime = millis();
-      wattCount = 0;
-    }
-    
+    lastResetTime = millis();
+    wattCount = 0;
+  }
+  else {
+    lastResetTime = millis();
+    notFirstWatt = true;
+    wattCount = 0;
+  }
 }
 
 void setup() {
