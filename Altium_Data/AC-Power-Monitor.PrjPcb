@@ -44,7 +44,7 @@ CrossRefPorts=3
 CrossRefCrossSheets=1
 CrossRefSheetEntries=0
 CrossRefFollowFromMainSettings=1
-CurrentVariant=B
+CurrentVariant=A
 
 [Preferences]
 PrefsVaultGUID=
@@ -57,7 +57,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=0
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -101,42 +101,86 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
+[Document4]
+DocumentPath=..\..\Libraries\Project Outputs for Ihle_Components\Ihle_Components.IntLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [ProjectVariant1]
 UniqueId=a651955a-96f5-4a29-96a7-4c16927efb2e
 Description=A
 AllowFabrication=0
 ParameterCount=0
-VariationCount=1
-Variation1=Designator=M?|UniqueId=\ZYOZFYIN|Kind=2|AlternatePart=AC/DC-Buck-Module|AltLibLink_LibIdentifierKind=Library Full Path|AltLibLink_LibraryIdentifier=C:\Users\ihma\Documents\Kunden\PLC2\Libraries\Project Outputs for Ihle_Components\Ihle_Components.IntLib|AltLibLink_SymbolReference=|AltLibLink_DesignItemID=AC/DC-Buck-Module|AltLibLink_UseLibraryName=True|AltLibLink_SourceLibraryName=Ihle_Components.IntLib|AltLibLink_UseDBTableName=False|AltLibLink_DatabaseTableName=|AltLibLink_VaultGUID=|AltLibLink_ItemGUID=|AltLibLink_RevisionGUID=|AltLibLink_Footprint=TMPM 04|AltLibLink_IsSameFootprint=False
-ParamVariation1=ParameterName=Comment|VariantValue=AC/DC-Buck-Module
-ParamDesignator1=M?
-ParamVariation2=ParameterName=Component Kind|VariantValue=Standard
-ParamDesignator2=M?
-ParamVariation3=ParameterName=Description|VariantValue=
-ParamDesignator3=M?
-ParamVariation4=ParameterName=Footprint|VariantValue=TMPM 04
-ParamDesignator4=M?
-ParamVariation5=ParameterName=Ibis Model|VariantValue=
-ParamDesignator5=M?
-ParamVariation6=ParameterName=Library Reference|VariantValue=AC/DC-Buck-Module
-ParamDesignator6=M?
-ParamVariation7=ParameterName=PCB3D|VariantValue=
-ParamDesignator7=M?
-ParamVariation8=ParameterName=Pin Info|VariantValue=
-ParamDesignator8=M?
-ParamVariation9=ParameterName=Signal Integrity|VariantValue=
-ParamDesignator9=M?
-ParamVariation10=ParameterName=Simulation|VariantValue=
-ParamDesignator10=M?
-ParamVariationCount=10
+VariationCount=4
+Variation1=Designator=U1|UniqueId=\PNERWTRC|Kind=1|AlternatePart=
+Variation2=Designator=C18|UniqueId=\LIHCFKCC|Kind=1|AlternatePart=
+Variation3=Designator=MOD1|UniqueId=\DUGMGHWN|Kind=1|AlternatePart=
+Variation4=Designator=M1|UniqueId=\VHWLLPZN|Kind=0|AlternatePart=
+ParamVariation1=ParameterName=Description|VariantValue=TRACO TMPS 03; 5.0V
+ParamDesignator1=M1
+ParamVariationCount=1
 
 [ProjectVariant2]
 UniqueId=af2c9b9c-a25b-4303-bec4-b9966dbc2a62
 Description=B
 AllowFabrication=0
 ParameterCount=0
-VariationCount=0
-ParamVariationCount=0
+VariationCount=2
+Variation1=Designator=MOD1|UniqueId=\DUGMGHWN|Kind=1|AlternatePart=
+Variation2=Designator=M1|UniqueId=\VHWLLPZN|Kind=2|AlternatePart=AC/DC-Buck-Module|AltLibLink_LibIdentifierKind=Library Full Path|AltLibLink_LibraryIdentifier=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\Libraries\Project Outputs for Ihle_Components\Ihle_Components.IntLib|AltLibLink_SymbolReference=|AltLibLink_DesignItemID=AC/DC-Buck-Module|AltLibLink_UseLibraryName=True|AltLibLink_SourceLibraryName=Ihle_Components.IntLib|AltLibLink_UseDBTableName=False|AltLibLink_DatabaseTableName=|AltLibLink_VaultGUID=|AltLibLink_ItemGUID=|AltLibLink_RevisionGUID=|AltLibLink_Footprint=AM11-12W05V|AltLibLink_IsSameFootprint=False
+ParamVariation1=ParameterName=Comment|VariantValue=AC/DC-Buck-Module
+ParamDesignator1=M1
+ParamVariation2=ParameterName=Footprint|VariantValue=AM11-12W05V
+ParamDesignator2=M1
+ParamVariation3=ParameterName=Component Kind|VariantValue=Standard
+ParamDesignator3=M1
+ParamVariation4=ParameterName=Description|VariantValue=AM11-12W05V; 5.0V
+ParamDesignator4=M1
+ParamVariation5=ParameterName=Ibis Model|VariantValue=
+ParamDesignator5=M1
+ParamVariation6=ParameterName=Library Reference|VariantValue=AC/DC-Buck-Module
+ParamDesignator6=M1
+ParamVariation7=ParameterName=PCB3D|VariantValue=
+ParamDesignator7=M1
+ParamVariation8=ParameterName=Pin Info|VariantValue=
+ParamDesignator8=M1
+ParamVariation9=ParameterName=Signal Integrity|VariantValue=
+ParamDesignator9=M1
+ParamVariation10=ParameterName=Simulation|VariantValue=
+ParamDesignator10=M1
+ParamVariation11=ParameterName=Output Voltage|VariantValue=<no parameter>
+ParamDesignator11=M1
+ParamVariationCount=11
+
+[ProjectVariant3]
+UniqueId=2c8a92d0-d7e3-476a-9b8d-5fe9e13ce985
+Description=C
+AllowFabrication=0
+ParameterCount=0
+VariationCount=6
+Variation1=Designator=J3|UniqueId=\CIBROXBP|Kind=1|AlternatePart=
+Variation2=Designator=J4|UniqueId=\OVEKKKGQ|Kind=1|AlternatePart=
+Variation3=Designator=P4|UniqueId=\JIZGEFRS|Kind=1|AlternatePart=
+Variation4=Designator=P5|UniqueId=\YBYJJIXF|Kind=1|AlternatePart=
+Variation5=Designator=P6|UniqueId=\HTXCULOP|Kind=1|AlternatePart=
+Variation6=Designator=M1|UniqueId=\VHWLLPZN|Kind=0|AlternatePart=
+ParamVariation1=ParameterName=Description|VariantValue=TRACO TMPS 03; 5.0V
+ParamDesignator1=M1
+ParamVariation2=ParameterName=Output Voltage|VariantValue=3.3V
+ParamDesignator2=M1
+ParamVariationCount=2
 
 [Configuration1]
 Name=Sources
@@ -1121,10 +1165,16 @@ NetClassManualEnabled=1
 NetClassSeparateForBusSections=0
 
 [LibraryUpdateOptions]
-SelectedOnly=0
+SelectedOnly=1
 UpdateVariants=1
 UpdateToLatestRevision=1
 PartTypes=0
+ComponentLibIdentifierKind0=Library Name And Type
+ComponentLibraryIdentifier0=Ihle_Components.IntLib
+ComponentDesignItemID0=AC/DC-Buck-Module
+ComponentSymbolReference0=AC/DC-Buck-Module
+ComponentUpdate0=1
+ComponentIsDeviceSheet0=0
 FullReplace=1
 UpdateDesignatorLock=1
 UpdatePartIDLock=1
@@ -1138,6 +1188,25 @@ RemoveParameters=0
 AddModels=1
 RemoveModels=1
 UpdateCurrentModels=1
+ParameterName0=Comment
+ParameterUpdate0=1
+ParameterName1=Component Kind
+ParameterUpdate1=1
+ParameterName2=Description
+ParameterUpdate2=1
+ParameterName3=Library Reference
+ParameterUpdate3=1
+ModelTypeGroup0=PCBLIB
+ModelTypeUpdate0=1
+ModelType0=PCBLIB
+ModelName0=AM11-12W05V
+ModelUpdate0=1
+ModelType1=PCBLIB
+ModelName1=TMPM 04
+ModelUpdate1=1
+ModelType2=PCBLIB
+ModelName2=TMPS 03
+ModelUpdate2=1
 
 [DatabaseUpdateOptions]
 SelectedOnly=0

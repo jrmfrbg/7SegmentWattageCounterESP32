@@ -2,3 +2,7 @@
 Version=1.0
 [Project1]
 ProjectPath=AC-Power-Monitor.PrjPcb
+[Project2]
+ProjectPath=..\..\Libraries\Altium_WRIS-RSKS (rev23a).LibPkg
+[Project3]
+ProjectPath=..\..\Libraries\Ihle_Components.LibPkg
