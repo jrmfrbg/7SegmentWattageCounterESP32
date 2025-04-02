@@ -36,7 +36,10 @@ ConstraintManagerFlow=0
 IsVirtualBomDocumentRemoved=0
 OutputPath=
 LogFolderPath=
-ManagedProjectGUID=
+ManagedProjectGUID=C3A613F7-3E97-485C-88D1-0822166B09BA
+VaultGUID=50CEA9A7-37DF-47C7-9E8E-7BF08C8EC857
+ReleaseVaultName=Ihle Engineering
+ItemGUID=C3A613F7-3E97-485C-88D1-0822166B09BA
 IncludeDesignInRelease=0
 CrossRefSheetStyle=1
 CrossRefLocationStyle=1
@@ -116,6 +119,23 @@ ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
+
+[Document5]
+DocumentPath=AC-Power-Monitor.PCBDwf
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=TKUJKXEU
 
 [ProjectVariant1]
 UniqueId=a651955a-96f5-4a29-96a7-4c16927efb2e
