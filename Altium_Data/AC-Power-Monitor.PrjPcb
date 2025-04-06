@@ -137,6 +137,23 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=TKUJKXEU
 
+[Document6]
+DocumentPath=Project Outputs for AC-Power-Monitor\AC-Power-Monitor.BomDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [ProjectVariant1]
 UniqueId=a651955a-96f5-4a29-96a7-4c16927efb2e
 Description=A
