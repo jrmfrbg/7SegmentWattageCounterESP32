@@ -1,0 +1,23 @@
+----------------------------------------------------------------------------------------------------------------------------------
+NCDrill File Report For: AC-Power-Monitor.PcbDoc   06.04.2025  18:54:36
+----------------------------------------------------------------------------------------------------------------------------------
+
+Layer Pair : Top Layer to Bottom Layer
+ASCII RoundHoles File : AC-Power-Monitor.TXT
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T1      0.2mm (8mil)            +0.1mm (4mil)/-0.05mm (2mil)      Round             585       PTH        1162.89mm (45.78inch)
+T2      0.2mm (8mil)                                              Round             5         PTH        4.33mm (0.17inch)
+T3      0.8mm (31mil)                                             Round             9         PTH        93.65mm (3.69inch)
+T4      0.9mm (35mil)                                             Round             4         PTH        20.71mm (0.82inch)
+T5      1mm (39mil)                                               Round             4         PTH        52.28mm (2.06inch)
+T6      1.02mm (40mil)                                            Round             16        PTH        50.80mm (2.00inch)
+T7      1.1mm (43mil)                                             Round             36        PTH        155.19mm (6.11inch)
+T8      1.3mm (51mil)                                             Round             6         PTH        25.00mm (0.98inch)
+T9      1.5mm (59mil)                                             Round             2         PTH        15.00mm (0.59inch)
+T10     4mm (157mil)            +0.1mm (4mil)/-0.05mm (2mil)      Round             6         PTH        215.15mm (8.47inch)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              673
+
+Total Processing Time (hh:mm:ss) : 00:00:00
