@@ -50,7 +50,7 @@ Configuration1_Item1=Record=SchPrintView|ShowNoERC=True|ShowParamSet=True|ShowPr
 OutputType2=BOM_PartType
 OutputName2=Bill of Materials
 OutputCategory2=Report
-OutputDocumentPath2=
+OutputDocumentPath2=[ActiveBOM Document]
 OutputVariantName2=[No Variations]
 OutputEnabled2=1
 OutputEnabled2_OutputMedium1=0
@@ -136,11 +136,11 @@ PageOptions7=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintS
 PcbPrintPreferences7=
 
 [PublishSettings]
-OutputFilePath2=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\.PDF
+OutputFilePath2=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\AC-Power-Monitor.pdf
 ReleaseManaged2=0
 OutputBasePath2=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\
-OutputPathMedia2=
-OutputPathMediaValue2=
+OutputPathMedia2=7SegmentWattageCounterESP32\Altium_Data\Project Outputs for AC-Power-Monitor
+OutputPathMediaValue2=7SegmentWattageCounterESP32\Altium_Data\Project Outputs for AC-Power-Monitor
 OutputPathOutputer2=[Output Type]
 OutputPathOutputerPrefix2=
 OutputPathOutputerValue2=
@@ -215,7 +215,7 @@ WmvVideoCodecName4=Windows Media Video V7
 WmvQuality4=80
 
 [GeneratedFilesSettings]
-RelativeOutputPath2=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\.PDF
+RelativeOutputPath2=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\AC-Power-Monitor.pdf
 OpenOutputs2=1
 RelativeOutputPath3=C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\7SegmentWattageCounterESP32\Altium_Data\Project Outputs for AC-Power-Monitor\
 OpenOutputs3=1
