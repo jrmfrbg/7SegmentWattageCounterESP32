@@ -62,13 +62,19 @@ PageOptions2=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintS
 Configuration2_Name1=ColumnNameFormat
 Configuration2_Item1=CaptionAsName
 Configuration2_Name2=General
-Configuration2_Item2=OpenExported=False|AddToProject=False|ReportBOMViolationsInMessages=False|ForceFit=False|NotFitted=False|Database=False|DatabasePriority=False|IncludePcbData=False|IncludeVaultData=False|IncludeCloudData=False|IncludeDocumentData=True|IncludeAlternatives=False|ShowExportOptions=True|TemplateFilename=|TemplateVaultGuid=50CEA9A7-37DF-47C7-9E8E-7BF08C8EC857|TemplateItemGuid=15A5975B-5E55-4918-B455-1FDC5085CFB3|TemplateRevisionGuid=DE7CD63A-4DE3-4C32-875B-D77F73A1D2D5|BatchMode=5|FormWidth=1200|FormHeight=710|SupplierProdQty=1|SupplierAutoQty=False|SupplierUseCachedPricing=False|SupplierCurrency=EUR|SolutionsPerItem=1|SuppliersPerSolution=1|ViewType=1|BomSetName=
+Configuration2_Item2=OpenExported=False|AddToProject=False|ReportBOMViolationsInMessages=False|ForceFit=False|NotFitted=False|Database=False|DatabasePriority=False|IncludePcbData=False|IncludeVaultData=False|IncludeCloudData=False|IncludeDocumentData=True|IncludeAlternatives=False|ShowExportOptions=True|TemplateFilename=|TemplateVaultGuid=50CEA9A7-37DF-47C7-9E8E-7BF08C8EC857|TemplateItemGuid=703A43D2-9525-476F-B299-A31018B88587|TemplateRevisionGuid=5E474FD7-D54E-4BD7-82E4-091DF24FEADD|BatchMode=5|FormWidth=1200|FormHeight=710|SupplierProdQty=1|SupplierAutoQty=False|SupplierUseCachedPricing=False|SupplierCurrency=EUR|SolutionsPerItem=1|SuppliersPerSolution=1|ViewType=1|BomSetName=
 Configuration2_Name3=GroupOrder
 Configuration2_Item3=Comment=True|Footprint=True
 Configuration2_Name4=SortOrder
 Configuration2_Item4=Designator=Up|Comment=Up|Footprint=Up
 Configuration2_Name5=VisibleOrder
 Configuration2_Item5=Comment=120|Description=120|Designator=120|Footprint=120|LibRef=120|Quantity=120
+Configuration2_Name6=VisibleOrder_Base
+Configuration2_Item6=Line #=54|Comment=100|Description=100|Designator=132|Revision ID=80|Revision Status=101|Quantity=67|Manufacturer 1=102|Manufacturer Part Number 1=169|Manufacturer Lifecycle 1=147|Supplier 1=75|Supplier Part Number 1=142|Supplier Unit Price 1=127|Supplier Subtotal 1=122
+Configuration2_Name7=VisibleOrder_Consolidated
+Configuration2_Item7=Line #=100|Comment=100|Description=100|Designator=100|Revision ID=100|Revision Status=100|Quantity=100|Manufacturer 1=102|Manufacturer Part Number 1=169|Manufacturer Lifecycle 1=147|Supplier 1=75|Supplier Part Number 1=142|Supplier Unit Price 1=127|Supplier Subtotal 1=122|Quantity@A=100|Price@A=100|Quantity@B=100|Price@B=100|Quantity@C=100|Price@C=100
+Configuration2_Name8=VisibleOrder_Flat
+Configuration2_Item8=Line #=100|Comment=100|Description=100|Designator=100|Revision ID=100|Revision Status=100|Manufacturer 1=102|Manufacturer Part Number 1=169|Manufacturer Lifecycle 1=147|Supplier 1=75|Supplier Part Number 1=142|Supplier Unit Price 1=127|Supplier Subtotal 1=122
 OutputType3=PCB 3D Video
 OutputName3=PCB 3D Video
 OutputCategory3=Documentation
