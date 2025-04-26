@@ -1,0 +1,58 @@
+Board Information Report
+Filename     : C:\Users\ihma\Documents\Kunden\Eigenentwicklungen\AC-Power-Monitor\7SegmentWattageCounterESP32\Altium_Data\AC-Power-Monitor.PcbDoc
+Date         : 02.04.2025
+Time         : 14:04:42
+Time Elapsed : 00:00:00
+
+General
+    Board Size, 94mmx57mm
+    Components on board, 65
+count : 2
+
+Layer, Arcs, Pads, Vias, Tracks, Texts, Fills, Regions, ComponentBodies
+    Top Layer, 0, 165, 0, 715, 0, 0, 26, 0
+    N / GND, 0, 0, 0, 6, 0, 0, 10, 0
+    L / VCC, 0, 0, 0, 37, 0, 0, 9, 0
+    Bottom Layer, 0, 0, 0, 257, 0, 0, 12, 0
+    Mechanical 1, 0, 0, 0, 0, 0, 0, 0, 8
+    Mechanical 2, 0, 0, 0, 10, 4, 0, 0, 1
+    Top Designator, 0, 0, 0, 0, 24, 0, 0, 0
+    Bottom Designator, 0, 0, 0, 0, 0, 0, 0, 0
+    Top Assembly, 0, 0, 0, 128, 31, 0, 0, 0
+    Top Component Outline, 0, 0, 0, 96, 0, 0, 0, 0
+    Bottom Component Outline, 0, 0, 0, 0, 0, 0, 0, 0
+    Top 3D Body, 0, 0, 0, 173, 0, 0, 0, 62
+    Top Courtyard, 0, 0, 0, 260, 0, 0, 0, 0
+    Top Component Center, 0, 0, 0, 98, 0, 0, 0, 0
+    Bottom Assembly, 0, 0, 0, 0, 0, 0, 0, 0
+    Bottom Courtyard, 0, 0, 0, 0, 0, 0, 0, 0
+    Bottom 3D Body, 0, 0, 0, 0, 0, 0, 0, 0
+    Bottom Component Center, 0, 0, 0, 0, 0, 0, 0, 0
+    Multi-Layer, 0, 77, 509, 0, 0, 0, 1, 0
+    Top Paste, 0, 0, 0, 0, 0, 0, 4, 0
+    Top Overlay, 22, 0, 0, 186, 144, 0, 4, 0
+    Top Solder, 0, 0, 0, 0, 0, 0, 1, 0
+    Bottom Solder, 0, 0, 0, 0, 0, 0, 0, 0
+    Bottom Overlay, 0, 0, 0, 0, 0, 0, 0, 0
+    Bottom Paste, 0, 0, 0, 0, 0, 0, 0, 0
+    Drill Guide, 0, 0, 0, 0, 0, 0, 0, 0
+    Keep-Out Layer, 0, 0, 0, 0, 0, 0, 1, 0
+    Drill Drawing, 0, 0, 0, 0, 0, 0, 0, 0
+count : 28
+
+Non-Plated Hole Size, Pads, Vias
+    0mm, 0, 0
+count : 1
+
+Plated Hole Size, Pads, Vias
+    0mm, 0, 0
+    0.2mm, 0, 0
+    0.8mm, 0, 0
+    0.9mm, 0, 0
+    1mm, 0, 0
+    1.02mm, 0, 0
+    1.1mm, 0, 0
+    1.3mm, 0, 0
+    1.5mm, 0, 0
+    4mm, 0, 0
+count : 10
