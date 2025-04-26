@@ -3,7 +3,7 @@
 #include <ESPmDNS.h>
 #include <FastLED.h>
 
-#define NUM_LEDS 24
+#define NUM_LEDS 21
 #define DATA_PIN 10
 #define FOTOTRANS_PIN 0
 
@@ -11,8 +11,8 @@ CRGB leds[NUM_LEDS];
 
 int fototransVal = 0;
 int currentNumb = 0;
-int segmentStartLed[] = {0, 3, 7, 10, 13, 17, 20};
-int segmentLedCount[] = {3, 4, 3, 3, 4, 3, 4};
+int segmentStartLed[] = {0, 3, 6, 9, 12, 15, 18};
+int segmentLedCount[] = {3, 3, 3, 3, 3, 3, 3};
 
 bool segments[10][7] = {
   {1, 1, 1, 1, 1, 1, 0}, // 0
@@ -33,13 +33,14 @@ int totalWattage = 0;
 WiFiServer server(80);
 int brightDevider = 0;
 
+
 void writeLeds(int segmentVar, bool state) {
     int start = segmentStartLed[segmentVar];
     int count = segmentLedCount[segmentVar];
-    brightDevider = (analogRead(FOTOTRANS_PIN) / 16);
+    //brightDevider = (analogRead(FOTOTRANS_PIN) / 16);
     for (int i = 0; i < count; i++) {
         if (state) {
-        leds[start + i] = CRGB((1 * brightDevider), (0 * brightDevider), (1 * brightDevider)); // Setzt nur RGB, kein Weiß
+        leds[start + i] = CRGB((1 * 255), (0), (1 * 255)); // Setzt nur RGB, kein Weiß
         } 
         else {
             leds[start + i] = CRGB::Black;
