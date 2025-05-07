@@ -84,8 +84,9 @@ void setup() {
 
   // --- Web Server Handler Setup ---
   server.on("/", HTTP_GET, handleRoot); // Call handleRoot for "/"
+  server.on("/data", handleData);
   server.onNotFound(handleNotFound);  // Handle invalid paths
-  server.begin(); // Start the web server
+  server.begin(); // Start the web serverserver.on("/", handleRoot);
   Serial.println("HTTP server started");
 
   lastUpdateMillis = millis(); // Initialize timing for energy calculation
@@ -115,14 +116,11 @@ void loop() {
           received_bytes = RXBUF_SIZE - 1;
         }
         rxbuf[received_bytes] = '\0';
-        //Serial.printf("Rohdaten (%d Bytes): %s\n", received_bytes, rxbuf); // Optional: uncomment for debugging raw data
         parseAndStore(rxbuf);
     }
   } else if (ret != ESP_ERR_TIMEOUT) { // Log errors other than timeout
     Serial.printf("Fehler beim SPI-Empfang: %s\n", esp_err_to_name(ret));
   }
-  // No delay needed here, as spi_slave_transmit has a timeout and server.handleClient() should run frequently.
-  // delay(10); // Can be removed or kept small
 }
 
 // === Data Parsing Function ===
@@ -164,31 +162,195 @@ void parseAndStore(const char *data) {
 
 // Function to handle the root ("/") request
 void handleRoot() {
-  String html = "<!DOCTYPE html><html><head><title>ESP32 Sensor Data</title>";
-  // Add meta tag for auto-refresh every 10 seconds
-  html += "<meta http-equiv='refresh' content='10'>";
-  html += "<style>";
-  html += "body { font-family: sans-serif; background-color: #f4f4f4; margin: 20px; }";
-  html += "h1 { color: #333; text-align: center; }";
-  html += ".container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }";
-  html += "p { font-size: 1.1em; line-height: 1.6; margin: 10px 0; }";
-  html += ".label { font-weight: bold; color: #555; }";
-  html += ".value { float: right; color: #007bff; }"; // Right align values
-  html += ".clearfix::after { content: \"\"; clear: both; display: table; }"; // Clearfix for floats
-  html += "</style>";
-  html += "</head><body>";
-  html += "<div class='container'>";
-  html += "<h1>ESP32 Sensor Data</h1>";
+  String html = R"rawliteral(
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mein lieber Scholli - Interface</title>
+  <style>
+    /* Basic reset */
+    body, h1, h2, h3, p, div, header, main, footer, input, button, details, summary {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(to right, #c4b5fd, #99f6e4);
+      color: #222;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    main {
+      flex: 1;
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.5rem; margin: 1rem 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 4px solid #7c3aed;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .card p.value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #7c3aed;
+    }
+    details {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    summary {
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    form > div {
+      margin-bottom: 0.75rem;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      color: #555;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background: #14b8a6;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #e5e7eb;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .clearfix::after { content: ""; display: table; clear: both; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mein lieber Scholli - Interface</h1>
+  </header>
 
-  // Display data using paragraph tags and spans for styling/layout
-  html += "<p class='clearfix'><span class='label'>Watt-Hours (Wh):</span><span class='value'>" + String(wattH, 3) + "</span></p>"; // Display Wh with 3 decimal places
-  html += "<p class='clearfix'><span class='label'>Voltage (Vrms):</span><span class='value'>" + String(vrmsStore, 2) + "</span></p>"; // Display Vrms with 2 decimal places
-  html += "<p class='clearfix'><span class='label'>Current (Arms):</span><span class='value'>" + String(armsStore, 3) + "</span></p>"; // Display Arms with 3 decimal places
-  html += "<p class='clearfix'><span class='label'>Power (Wrms):</span><span class='value'>" + String(wrmsStore, 1) + "</span></p>"; // Display Wrms with 1 decimal place
+  <main>
+    <h2>Aktuelle Messwerte</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Spannung (Vrms)</h3>
+        <p class="value"><span id="vrms">–</span> V</p>
+      </div>
+      <div class="card">
+        <h3>Leistung (Wrms)</h3>
+        <p class="value"><span id="wrms">–</span> W</p>
+      </div>
+      <div class="card">
+        <h3>Stromstärke (Arms)</h3>
+        <p class="value"><span id="arms">–</span> A</p>
+      </div>
+      <div class="card">
+        <h3>Watt-Stunden (Wh)</h3>
+        <p class="value"><span id="wh">–</span> Wh</p>
+      </div>
+    </div>
 
-  html += "</div></body></html>";
+    <details>
+      <summary>WiFi Einstellungen (hopefully working soon)</summary>
+      <form>
+        <div>
+          <label for="ssid">SSID</label>
+          <input id="ssid" type="text" placeholder="Deine SSID">
+        </div>
+        <div>
+          <label for="password">Passwort</label>
+          <input id="password" type="password" placeholder="Dein Passwort">
+        </div>
+        <button type="button">Speichern</button>
+      </form>
+    </details>
+  </main>
 
-  server.send(200, "text/html", html); // Send the HTML page to the client
+  <footer>
+    <p>Mitwirkende: GitHub jrmfrbg – FreiLab – Ihle Engineering – Balkon.solar</p>
+    <p>&copy; 2025 Jorim Stern</p>
+  </footer>
+
+  <script>
+    // Daten alle 5 Sekunden abrufen
+    setInterval(fetchData, 500);
+
+    function fetchData() {
+      fetch('/data')
+        .then(res => res.json())
+        .then(d => {
+          document.getElementById('vrms').textContent = d.vrms.toFixed(2);
+          document.getElementById('wrms').textContent = d.wrms.toFixed(1);
+          document.getElementById('arms').textContent = d.arms.toFixed(3);
+          document.getElementById('wh').textContent   = d.wattH.toFixed(3);
+        })
+        .catch(err => console.error('Fetch /data fehlgeschlagen:', err));
+    }
+
+    // Initialer Ladevorgang
+    fetchData();
+  </script>
+</body>
+</html>
+
+)rawliteral";
+
+  server.send(200, "text/html", html);
+}
+
+void handleData() {
+  // Build a JSON object with your float variables
+  String json = "{";
+  json += "\"wattH\":"  + String(wattH,  3) + ",";
+  json += "\"vrms\":"   + String(vrmsStore, 2) + ",";
+  json += "\"arms\":"   + String(armsStore, 3) + ",";
+  json += "\"wrms\":"   + String(wrmsStore, 1);
+  json += "}";
+  
+  server.send(200, "application/json", json);
 }
 
 // Function to handle requests for paths that are not found
