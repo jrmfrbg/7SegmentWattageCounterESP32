@@ -2,10 +2,13 @@
 #include <WiFiServer.h>
 #include <ESPmDNS.h>
 #include <FastLED.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>  // Für das Parsen der JSON-Antwort
+#include <stdlib.h> // For strtof
 
-#define NUM_LEDS 120
+#define NUM_LEDS 132
 #define DATA_PIN 10
-#define FOTOTRANS_PIN 0
+//#define FOTOTRANS_PIN 0
 
 CRGB leds[NUM_LEDS];
 
@@ -13,8 +16,13 @@ int fototransVal = 0;
 int currentNumb = 0;
 int segmentStartLed[] = { 0, 3, 6, 9, 12, 15, 18 };
 int segmentLedCount[] = { 3, 3, 3, 3, 3, 3, 3 };
-int debugPrint = 0;
-int digitStartLed[] = { 0, 20, 40, 60, 80, 100 };
+//int debugPrint = 0;
+int digitStartLed[] = { 0, 22, 44, 66, 88, 110 };
+String payloadString = "foo";
+const char *masterIp = "192.168.4.1"; // Standard-IP des ESP32 im AP-Modus
+const uint16_t masterPort = 80;
+const char *dataEndpoint = "/data";
+
 
 bool segments[10][7] = {
   { 1, 1, 1, 1, 1, 1, 0 },  // 0
@@ -32,25 +40,29 @@ bool segments[10][7] = {
 const char *ssid = "BalkonSolarDisplay";
 const char *password = "12345678";
 float totalWattage = 0000.0;
+float lasttotalWattage = 0000.0;
 WiFiServer server(80);
 int brightDevider = 0;
 
 
-
+//function 4 in Stream, writes the values it recieves to the LEDs
+//input: int, int, bool; digitVar: what digit to write to, segmentVar: what segment of Digit to write to, state to write: true=on false=off;
+//output: writes the leds to leds[]
 
 void writeLeds(int digitVar, int segmentVar, bool state) {
-  
+
   int start = segmentStartLed[segmentVar] + digitStartLed[digitVar];
+  int count = segmentLedCount[segmentVar];
   for (int i = 0; i < count; i++) {
     if (state == true) {
-      leds[start + i] = CRGB((1 * 255), (0), (1 * 255));
+      leds[start + i] = CRGB((255), (0), (0));
     } else {
       leds[start + i] = CRGB::Black;
     }
   }
 }
 
-//Function 1 in stream 
+//Function 1 in stream
 //Input: get total wattage from void loop
 //Parse the input. Each digit of the input float is sent to displayNumber(). the dec point is send to writeDecPoint()
 
@@ -63,26 +75,46 @@ void writeDigit(float number) {
   for (int i = 0; i <= 5; i++) {
     char currentChar = numberString[i];
     char dotChar = '.';
-    if (currentChar == dotChar) {
+
+    if(currentChar == '-') {
+        writeMinus(i, true);
+        i++;
+    }
+    else if (currentChar == dotChar) {
       writeDecPoint(i, true);
     }
-
     else {
-      writeDecPoint(i, false);
-      displayNumber(currentChar - 0, i);
+      displayNumber(currentChar - '0', i);
     }
   }
 }
+
+void writeMinus(int digitVar, bool state) {
+
+  if (state == true) {
+    for(int i = 0; i <= 2; i++) {
+      leds[18 + i] = CRGB((200), (0), (0));
+    }
+  }
+}
+
 
 
 //function 2 ins stream
 //input: (int, bool): what dec point to write to, status of dec point on/off, send by writeDigit
 //output: writes the current decimalpoint to leds[]
 void writeDecPoint(int digitVar, bool state) {
-  if (state = true) {
-    leds[digitStartLed[digitVar] - 1] = CRGB(1 * 255), (0), (1 * 255);
-  } else {
-    leds[digitStartLed[digitVar] - 1] = CRGB::Black;
+  Serial.print("decPoint state: ");
+  Serial.println(state);
+
+  if (state == true) {
+    Serial.println("dec point set to high");
+    leds[digitStartLed[digitVar] - 1] = CRGB((200), (0), (0));
+  }
+
+  else {
+    Serial.println("dec point set to low");
+    //leds[digitStartLed[digitVar] - 1] = CRGB::Black;
   }
 }
 
@@ -90,36 +122,26 @@ void writeDecPoint(int digitVar, bool state) {
 //input: what digit to write, where to write
 //output: int, bool, bool
 void displayNumber(int digit, int digitCount) {
-  Serial.println("displayNumber 1");
   for (int i = 0; i < 7; i++) {
-    Serial.println("displayNumber 2");
-    Serial.print("");
-    writeLeds(i, digitCount, segments[digit][i]);
+    writeLeds(digitCount, i, segments[digit][i]);
   }
 }
 
 void setup() {
-  pinMode(FOTOTRANS_PIN, INPUT);
-  Serial.begin(115200);
+  //pinMode(FOTOTRANS_PIN, INPUT);
+  Serial.begin(9600);
   FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(255);
-  // WLAN-Verbindung zum AP herstellen
-  /*
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("\nVerbunden!");
-    Serial.print("IP-Adresse: ");
-    Serial.println(WiFi.localIP());
-
-    if (!MDNS.begin("esp-slaveCurrentWattage")) {
-        Serial.println("Fehler beim Start von mDNS!");
-    } else {
-        Serial.println("mDNS-Dienst gestartet: esp-slaveCurrentWattage.local");
-    }
-    */
+  
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nVerbunden!");
+  Serial.print("IP-Adresse: ");
+  Serial.println(WiFi.localIP());
+  
   fill_solid(leds, NUM_LEDS, CRGB::Black);
   writeDigit(totalWattage);
   FastLED.show();
@@ -128,32 +150,56 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(totalWattage);
-  debugPrint = 0;
-  Serial.println(debugPrint);
-  debugPrint++;
-  totalWattage = totalWattage + 0.1;
-  if (totalWattage == 9999.9) {
-    totalWattage = 0;
+  HTTPClient http;
+  if (WiFi.status() == WL_CONNECTED) {
+    String serverUrl = "http://" + String(masterIp) + ":" + String(masterPort) + String(dataEndpoint);
+    http.begin(serverUrl);
+    Serial.print("http.GET=");
+    int httpCode = http.GET();  // GET-Anfrage senden
+    Serial.println(httpCode);
+    if (httpCode > 0) {
+      if (httpCode == HTTP_CODE_OK) {
+        payloadString = http.getString();
+        Serial.println("Antwort vom Server:");
+        Serial.println(payloadString);
+        int state = 0;
+        String wattH;
+        for (char c : payloadString) {
+          if (state == 0) {
+            if (c == ':') {
+              state = 1;
+            }
+          } else if (state == 1) {
+            if (c == ',') {
+              state = 2;
+              break;
+            }
+            wattH += c;
+            Serial.print("wattH = ");
+            Serial.println(wattH);
+            totalWattage = wattH.toFloat();
+          }
+        }
+      }
+    } else {
+      Serial.println("error with HTTP");
+    }
   }
-  Serial.println(debugPrint);
-  debugPrint++;
+
   Serial.print("totalWattage=");
   Serial.println(totalWattage);
   fill_solid(leds, NUM_LEDS, CRGB::Black);
-  Serial.println(debugPrint);
-  debugPrint++;
-  writeDigit(totalWattage);
-  Serial.println(debugPrint);
-  debugPrint++;
-  FastLED.show();
-  Serial.println(debugPrint);
-  debugPrint++;
+  if(lasttotalWattage != totalWattage) {
+    writeDigit(totalWattage);
+    FastLED.show();
+    lasttotalWattage = totalWattage;
+    Serial.println("-------------------------------------------------------------------------------------");
+  }
+  
+
   Serial.print("foto transistor Value: ");
-  Serial.println(debugPrint);
-  debugPrint++;
-  Serial.println(analogRead(FOTOTRANS_PIN));
-  Serial.println(debugPrint);
-  debugPrint++;
+  //Serial.println(analogRead(FOTOTRANS_PIN));
+  Serial.print("total wattage: ");
+  Serial.println(totalWattage);
   delay(500);
 }

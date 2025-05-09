@@ -37,6 +37,8 @@ float wattH = 0.0;
 void handleRoot();
 void handleNotFound();
 void parseAndStore(const char *data);
+void handleData(); // Added prototype
+void handleResetEnergy(); // Added prototype for reset handler
 
 // === Setup Function ===
 void setup() {
@@ -52,7 +54,7 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   // --- mDNS Setup (optional, access via http://esp32.local/) ---
-  if (MDNS.begin("esp32")) { // Hostname "esp32"
+  if (MDNS.begin("mlScholliMaster")) { // Hostname "mlScholliMaster"
     Serial.println("MDNS responder started");
     MDNS.addService("http", "tcp", 80); // Advertise web server
   } else {
@@ -84,9 +86,10 @@ void setup() {
 
   // --- Web Server Handler Setup ---
   server.on("/", HTTP_GET, handleRoot); // Call handleRoot for "/"
-  server.on("/data", handleData);
+  server.on("/data", HTTP_GET, handleData); // Ensure HTTP_GET is specified
+  server.on("/reset_energy", HTTP_POST, handleResetEnergy); // Handler for resetting energy
   server.onNotFound(handleNotFound);  // Handle invalid paths
-  server.begin(); // Start the web serverserver.on("/", handleRoot);
+  server.begin(); // Start the web server
   Serial.println("HTTP server started");
 
   lastUpdateMillis = millis(); // Initialize timing for energy calculation
@@ -149,7 +152,7 @@ void parseAndStore(const char *data) {
     lastUpdateMillis = currentTime;
 
     // Print parsed values to Serial monitor (optional)
-    Serial.printf("Parsed -> Vrms=%.2f, Arms=%.3f, Wrms=%.1f, WattH=%.3f\n", vrmsStore, armsStore, wrmsStore, wattH);
+    // Serial.printf("Parsed -> Vrms=%.2f, Arms=%.3f, Wrms=%.1f, WattH=%.3f\n", vrmsStore, armsStore, wrmsStore, wattH);
 
   } else {
     // Print an error message if parsing failed
@@ -249,13 +252,22 @@ void handleRoot() {
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    button {
+    button { /* General button style */
       padding: 0.5rem 1rem;
-      background: #14b8a6;
+      background: #14b8a6; /* Teal color from original "Speichern" */
       color: #fff;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 1rem; /* Ensure consistent font size */
+      margin-top: 0.5rem; /* Add some top margin */
+    }
+    button:hover {
+        opacity: 0.9;
+    }
+    .reset-button-container { /* Container for the reset button */
+        margin-top: 1.5rem; /* Space above the button */
+        text-align: center; /* Center the button */
     }
     footer {
       text-align: center;
@@ -293,16 +305,18 @@ void handleRoot() {
       </div>
     </div>
 
+    <div class="reset-button-container">
+        <button id="resetEnergyButton">Energie Zähler Reset</button>
+    </div>
+
     <details>
       <summary>WiFi Einstellungen (hopefully working soon)</summary>
       <form>
         <div>
-          <label for="ssid">SSID</label>
-          <input id="ssid" type="text" placeholder="Deine SSID">
+          <label for="ssid_input">SSID</label> <input id="ssid_input" type="text" placeholder="Deine SSID">
         </div>
         <div>
-          <label for="password">Passwort</label>
-          <input id="password" type="password" placeholder="Dein Passwort">
+          <label for="password_input">Passwort</label> <input id="password_input" type="password" placeholder="Dein Passwort">
         </div>
         <button type="button">Speichern</button>
       </form>
@@ -315,12 +329,17 @@ void handleRoot() {
   </footer>
 
   <script>
-    // Daten alle 5 Sekunden abrufen
+    // Daten alle 0.5 Sekunden abrufen
     setInterval(fetchData, 500);
 
     function fetchData() {
       fetch('/data')
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok: ' + res.statusText);
+            }
+            return res.json();
+        })
         .then(d => {
           document.getElementById('vrms').textContent = d.vrms.toFixed(2);
           document.getElementById('wrms').textContent = d.wrms.toFixed(1);
@@ -329,6 +348,26 @@ void handleRoot() {
         })
         .catch(err => console.error('Fetch /data fehlgeschlagen:', err));
     }
+
+    document.getElementById('resetEnergyButton').addEventListener('click', function() {
+        if (confirm('Möchten Sie die Energiezähler (Wh und Joule) wirklich zurücksetzen?')) {
+            fetch('/reset_energy', {
+                method: 'POST' // Specify POST method
+            })
+            .then(res => {
+                if (res.ok) {
+                    console.log('Energiezähler zurückgesetzt.');
+                    fetchData(); // Daten neu laden, um die Anzeige zu aktualisieren
+                } else {
+                    alert('Fehler beim Zurücksetzen der Energiezähler.');
+                }
+            })
+            .catch(err => {
+                console.error('Fetch /reset_energy fehlgeschlagen:', err);
+                alert('Fehler bei der Kommunikation mit dem Server.');
+            });
+        }
+    });
 
     // Initialer Ladevorgang
     fetchData();
@@ -353,13 +392,26 @@ void handleData() {
   server.send(200, "application/json", json);
 }
 
+// Function to handle energy reset requests
+void handleResetEnergy() {
+  Serial.println("Resetting energy counters (Joule and Wh)...");
+  joule = 0.0;
+  wattH = 0.0;
+  // Optionally, you can also reset lastUpdateMillis if you want the calculation
+  // to behave as if it just started, but it's generally not needed for just resetting accumulated energy.
+  // lastUpdateMillis = millis(); 
+  Serial.println("Energy counters have been reset.");
+  server.send(200, "text/plain", "Energy counters reset successfully.");
+}
+
+
 // Function to handle requests for paths that are not found
 void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri(); // Get the requested URI
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST"; // Updated to show POST
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
