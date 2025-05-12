@@ -72,20 +72,23 @@ void writeLeds(int digitVar, int segmentVar, bool state) {
 void writeDigit(float number) {
   std::string numberString;
   numberString = std::__cxx11::to_string(number);
+  int stri = 0;
   for (int i = 0; i <= 5; i++) {
-    char currentChar = numberString[i];
+    char currentChar = numberString[stri];
     char dotChar = '.';
 
     if(currentChar == '-') {
         writeMinus(i, true);
-        i++;
     }
     else if (currentChar == dotChar) {
       writeDecPoint(i, true);
+      i--;
+      //displayNumber(currentChar - '0', i);
     }
     else {
       displayNumber(currentChar - '0', i);
     }
+    stri++;
   }
 }
 

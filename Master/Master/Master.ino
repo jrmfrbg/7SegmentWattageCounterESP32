@@ -138,7 +138,7 @@ void parseAndStore(const char *data) {
     float timeDiffSeconds = (currentTime - lastUpdateMillis) / 1000.0;
 
     // Update energy calculation only if time has passed and power is positive
-    if (timeDiffSeconds > 0 && wrms_f >= 0) {
+    if (timeDiffSeconds > 0) {
       joule += wrms_f * timeDiffSeconds; // Accumulate energy in Joules (Watt-seconds)
       wattH = joule / 3600.0;         // Convert Joules to Watt-hours
     }
