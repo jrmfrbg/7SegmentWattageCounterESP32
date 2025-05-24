@@ -21,8 +21,21 @@ volatile int32_t adcA0Data, adcA1Data;
 // Power Measurement defines
 #define MEASUREMENT_COUNT  1965  // number of samples per measurement 1965 = 0.5s
 #define INV_MEASUREMENT_COUNT (1/(float)MEASUREMENT_COUNT)
-#define VSCALE 0.000061920       // scaling factor to calibrate voltage measurements
-#define ISCALE 0.000004188       // scaling factor to calibrate current measurements
+
+// scaling factor to calibrate voltage measurements:
+#define VSCALE 0.000061920       // factor for device #0001
+//#define VSCALE 0.000061427       // factor for device #0002
+//#define VSCALE 0.000061818       // factor for device #0003
+//#define VSCALE 0.000061671       // factor for device #0004
+//#define VSCALE 0.000061339       // factor for device #0005
+
+// scaling factor to calibrate current measurements:
+#define ISCALE 0.0000042392       // factor for device #0001
+//#define ISCALE 0.0000042309       // factor for device #0002
+//#define ISCALE 0.0000042279       // factor for device #0003
+//#define ISCALE 0.0000042124       // factor for device #0004
+//#define ISCALE 0.0000042165       // factor for device #0005
+
 #define PRMSMIN 0.5              // Power threshold: below this power, the current noise value may be increased
 #define IMS0INITVALUE 20000000   // Rough estimation of squared current noise level
 #define IMS0SCALER 1.05          // scaling factor to reduce measurement of current noise
