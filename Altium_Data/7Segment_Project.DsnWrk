@@ -6,3 +6,7 @@ ProjectPath=AC-Power-Monitor.PrjPcb
 ProjectPath=..\..\Libraries\Altium_WRIS-RSKS (rev23a).LibPkg
 [Project3]
 ProjectPath=..\..\Libraries\Ihle_Components.LibPkg
+[Project4]
+ProjectPath=..\..\..\BLDC_Driver\BLDC_Driver.PrjPcb
+[Project5]
+ProjectPath=..\..\..\High_Speed_Testbed\High_Speed_Testbed.PrjPcb
