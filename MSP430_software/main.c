@@ -10,6 +10,7 @@
 #include "GPIO.h"
 #include "CS.h"
 #include "IO_functions.h"
+#include "hann_window.h"
 
 // # defines for application code
 #define STR_LEN_ONE      1
@@ -19,22 +20,21 @@ volatile uint8_t  command, adcChannel, adcA0Preload, adcA1Preload, adcA0Gain, ad
 volatile int32_t adcA0Data, adcA1Data;
 
 // Power Measurement defines
-#define MEASUREMENT_COUNT  1965  // number of samples per measurement 1965 = 0.5s
 #define INV_MEASUREMENT_COUNT (1/(float)MEASUREMENT_COUNT)
 
 // scaling factor to calibrate voltage measurements:
-#define VSCALE 0.000061920       // factor for device #0001
-//#define VSCALE 0.000061427       // factor for device #0002
-//#define VSCALE 0.000061818       // factor for device #0003
-//#define VSCALE 0.000061671       // factor for device #0004
-//#define VSCALE 0.000061339       // factor for device #0005
+//#define VSCALE 0.000043784       // factor for device #0001
+#define VSCALE 0.000043444       // factor for device #0002
+//#define VSCALE 0.000043712       // factor for device #0003
+//#define VSCALE 0.000043608       // factor for device #0004
+//#define VSCALE 0.000043373       // factor for device #0005
 
 // scaling factor to calibrate current measurements:
-#define ISCALE 0.0000042392       // factor for device #0001
-//#define ISCALE 0.0000042309       // factor for device #0002
-//#define ISCALE 0.0000042279       // factor for device #0003
-//#define ISCALE 0.0000042124       // factor for device #0004
-//#define ISCALE 0.0000042165       // factor for device #0005
+//#define ISCALE 0.0000029976       // factor for device #0001
+#define ISCALE 0.0000029838       // factor for device #0002
+//#define ISCALE 0.0000029896       // factor for device #0003
+//#define ISCALE 0.0000029786       // factor for device #0004
+//#define ISCALE 0.0000029815       // factor for device #0005
 
 #define PRMSMIN 0.5              // Power threshold: below this power, the current noise value may be increased
 #define IMS0INITVALUE 20000000   // Rough estimation of squared current noise level
@@ -42,6 +42,8 @@ volatile int32_t adcA0Data, adcA1Data;
 #define TXTLENGTH 80             // maximum number of characters allowed for the TXData buffer
 
 int64_t  Vms, Ims, Pms, Vdc, Idc;     // variables to sum up sample values; ms: sum of squared or multiplied values
+
+const float win[MEASUREMENT_COUNT];
 
 float Vrms, Irms, Prms, VArms, tmpfloat;
 uint32_t Ims0;
@@ -94,7 +96,6 @@ void main(void)
     // Setting the DCO to use the internal resistor. DCO will be at 16.384MHz
     // ACLK is at 32kHz
     CS_setupDCO(CS_INTERNAL_RESISTOR);
-
 
 if (1==0)
 {
@@ -189,8 +190,8 @@ if (1==0)
         // Send ADC data to GUI (when ready)
         if(adcReady == 1)
         {
-            voltage = adcA1Data; // voltage
-            current = adcA0Data; // current
+            voltage = adcA1Data * WIN[n]; // voltage
+            current = adcA0Data * WIN[n++]; // current
 
             // integrate values
             Vdc += voltage;
@@ -199,19 +200,18 @@ if (1==0)
             Ims += current * current;
             Pms += voltage * current;
 
-            n++;
+//            n++;
 
             if (n >= MEASUREMENT_COUNT)
             {
 
 //                P1OUT &= ~GPIO_PIN4; //  set P1.4 (GPIO3) to L to enable CS
 // ---------------- calculate Vrms ----------------
-
-                tmpfloat = (Vdc * Vdc) * INV_MEASUREMENT_COUNT;
+                tmpfloat = (Vdc * Vdc) * (WG2/WG1/WG1);
                 tmpfloat = Vms - tmpfloat;
                 if (tmpfloat > 0.0)
                 {
-                    Vrms = sqrtf(tmpfloat * INV_MEASUREMENT_COUNT) * VSCALE;
+                    Vrms = sqrtf(tmpfloat * (2.0/WG2)) * VSCALE;
                 }
                 else
                 {
@@ -219,15 +219,15 @@ if (1==0)
                 }
 
 // ---------------- calculate Prms ----------------
-                tmpfloat = (Vdc * Idc) * INV_MEASUREMENT_COUNT;
-                Prms = (Pms  - tmpfloat) * (INV_MEASUREMENT_COUNT * VSCALE * ISCALE);
+                tmpfloat = (Vdc * Idc) * (WG2/WG1/WG1);
+                Prms = (Pms  - tmpfloat) * (2.0/WG2 * VSCALE * ISCALE);
 
 // ---------------- calculate Irms ----------------
-                tmpfloat = Idc * Idc * INV_MEASUREMENT_COUNT;
+                tmpfloat = Idc * Idc * (WG2/WG1/WG1);
                 tmpfloat = Ims - tmpfloat;
                 if (tmpfloat > 0.0)
                 {
-                    tmpfloat *= INV_MEASUREMENT_COUNT;
+                    tmpfloat *= (2.0/WG2);
                     if (Prms < PRMSMIN)
                     {
                         Ims0 *= IMS0SCALER;  // increase Ims0 by a constant factor
@@ -244,10 +244,10 @@ if (1==0)
                 }
 
 
-                                // ---------------- calculate VArms ----------------
+// ---------------- calculate VArms ----------------
                 VArms = Vrms * Irms;
 
-  //              P1OUT |= GPIO_PIN4; //  set P1.4 (GPIO3) to H to disable CS
+//              P1OUT |= GPIO_PIN4; //  set P1.4 (GPIO3) to H to disable CS
 
 
 // Output all results
