@@ -3,6 +3,7 @@
 #include <WebServer.h> // <<< Added WebServer library
 #include <ESPmDNS.h>
 #include <Arduino.h>
+#include <Preferences.h> // <<< Added for flash storage
 
 extern "C" {
 #include "driver/spi_slave.h"
@@ -15,9 +16,18 @@ extern "C" {
 #define PIN_SPI_CS 2
 #define RXBUF_SIZE 256
 
-// === WiFi Credentials ===
-const char *ssid = "BalkonSolarDisplay";
-const char *password = "12345678";
+// === WiFi Credentials (Default fallback) ===
+String default_ssid = "Lieber-Scholli";
+String default_password = "12345678";
+String device_hostname = "scholli"; // <<< Added hostname for easy identification
+
+// === Current WiFi Credentials ===
+String current_ssid = "";
+String current_password = "";
+bool wifi_client_mode = false; // Track if we're in client mode
+
+// === Preferences object for flash storage ===
+Preferences preferences;
 
 // === Web Server Instance ===
 WebServer server(80); // Create a web server object on port 80
@@ -37,8 +47,12 @@ float wattH = 0.0;
 void handleRoot();
 void handleNotFound();
 void parseAndStore(const char *data);
-void handleData(); // Added prototype
-void handleResetEnergy(); // Added prototype for reset handler
+void handleData();
+void handleResetEnergy();
+void handleSaveWiFi(); // <<< Added prototype for WiFi save handler
+void loadWiFiCredentials(); // <<< Added prototype for loading WiFi credentials
+void saveWiFiCredentials(const String& ssid, const String& password); // <<< Added prototype for saving WiFi credentials
+void connectToWiFi(); // <<< Added prototype for WiFi connection
 
 // === Setup Function ===
 void setup() {
@@ -46,16 +60,16 @@ void setup() {
   Serial.println("Startup loading...");
   delay(100); // Short delay for stability
 
-  // --- WiFi Access Point Setup ---
-  Serial.print("Starting Access Point: ");
-  Serial.println(ssid);
-  WiFi.softAP(ssid, password);
-  Serial.print("AP IP Address: ");
-  Serial.println(WiFi.softAPIP());
+  // --- Load WiFi credentials from flash ---
+  loadWiFiCredentials();
 
-  // --- mDNS Setup (optional, access via http://esp32.local/) ---
-  if (MDNS.begin("mlScholliMaster")) { // Hostname "mlScholliMaster"
+  // --- WiFi Setup ---
+  connectToWiFi();
+
+  // --- mDNS Setup (optional, access via http://scholli-master.local/) ---
+  if (MDNS.begin(device_hostname.c_str())) { // Use the hostname variable
     Serial.println("MDNS responder started");
+    Serial.println("Access device via: http://" + device_hostname + ".local/");
     MDNS.addService("http", "tcp", 80); // Advertise web server
   } else {
     Serial.println("Error starting MDNS");
@@ -85,14 +99,84 @@ void setup() {
   Serial.println("SPI-Slave bereit.");
 
   // --- Web Server Handler Setup ---
-  server.on("/", HTTP_GET, handleRoot); // Call handleRoot for "/"
-  server.on("/data", HTTP_GET, handleData); // Ensure HTTP_GET is specified
-  server.on("/reset_energy", HTTP_POST, handleResetEnergy); // Handler for resetting energy
-  server.onNotFound(handleNotFound);  // Handle invalid paths
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/data", HTTP_GET, handleData);
+  server.on("/reset_energy", HTTP_POST, handleResetEnergy);
+  server.on("/save_wifi", HTTP_POST, handleSaveWiFi); // <<< Added WiFi save handler
+  server.onNotFound(handleNotFound);
   server.begin(); // Start the web server
   Serial.println("HTTP server started");
 
   lastUpdateMillis = millis(); // Initialize timing for energy calculation
+}
+
+// === WiFi Functions ===
+
+void loadWiFiCredentials() {
+  preferences.begin("wifi", false); // Open preferences in read-write mode
+  
+  current_ssid = preferences.getString("ssid", "");
+  current_password = preferences.getString("password", "");
+  
+  preferences.end();
+  
+  Serial.println("WiFi credentials loaded from flash:");
+  Serial.println("SSID: " + (current_ssid.length() > 0 ? current_ssid : String("not set")));
+  Serial.println("Password: " + (current_password.length() > 0 ? String("set") : String("not set")));
+}
+
+void saveWiFiCredentials(const String& ssid, const String& password) {
+  preferences.begin("wifi", false); // Open preferences in read-write mode
+  
+  preferences.putString("ssid", ssid);
+  preferences.putString("password", password);
+  
+  preferences.end();
+  
+  Serial.println("WiFi credentials saved to flash:");
+  Serial.println("SSID: " + ssid);
+  Serial.println("Password: set");
+}
+
+void connectToWiFi() {
+  // Set hostname for easier identification
+  WiFi.setHostname(device_hostname.c_str());
+  
+  // Try to connect to saved WiFi credentials first
+  if (current_ssid.length() > 0 && current_password.length() > 0) {
+    Serial.println("Attempting to connect to saved WiFi: " + current_ssid);
+    WiFi.begin(current_ssid.c_str(), current_password.c_str());
+    
+    // Wait up to 10 seconds for connection
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+      delay(500);
+      Serial.print(".");
+      attempts++;
+    }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      wifi_client_mode = true;
+      Serial.println();
+      Serial.println("WiFi connected successfully!");
+      Serial.print("IP address: ");
+      Serial.println(WiFi.localIP());
+      Serial.print("Hostname: ");
+      Serial.println(device_hostname);
+      return;
+    } else {
+      Serial.println();
+      Serial.println("Failed to connect to saved WiFi. Starting Access Point...");
+    }
+  }
+  
+  // Fall back to Access Point mode
+  wifi_client_mode = false;
+  Serial.print("Starting Access Point: ");
+  Serial.println(default_ssid);
+  WiFi.softAP(default_ssid.c_str(), default_password.c_str());
+  Serial.print("AP IP Address: ");
+  Serial.println(WiFi.softAPIP());
 }
 
 // === Main Loop ===
@@ -223,6 +307,34 @@ void handleRoot() {
       font-weight: bold;
       color: #7c3aed;
     }
+    .status-indicator {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+    .status-ap {
+      background-color: #fbbf24;
+      color: #92400e;
+    }
+    .status-client {
+      background-color: #34d399;
+      color: #065f46;
+    }
+    .wifi-info {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+    .wifi-info a {
+      color: #7c3aed;
+      text-decoration: none;
+    }
+    .wifi-info a:hover {
+      text-decoration: underline;
+    }
     details {
       background: #fff;
       padding: 1rem;
@@ -265,9 +377,29 @@ void handleRoot() {
     button:hover {
         opacity: 0.9;
     }
+    button:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+    }
     .reset-button-container { /* Container for the reset button */
         margin-top: 1.5rem; /* Space above the button */
         text-align: center; /* Center the button */
+    }
+    .message {
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .message.success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #34d399;
+    }
+    .message.error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
     }
     footer {
       text-align: center;
@@ -282,6 +414,7 @@ void handleRoot() {
 <body>
   <header>
     <h1>Mein lieber Scholli - Interface</h1>
+    <div id="wifi-status"></div>
   </header>
 
   <main>
@@ -310,15 +443,18 @@ void handleRoot() {
     </div>
 
     <details>
-      <summary>WiFi Einstellungen (hopefully working soon)</summary>
-      <form>
+      <summary>WiFi Einstellungen</summary>
+      <form id="wifiForm">
         <div>
-          <label for="ssid_input">SSID</label> <input id="ssid_input" type="text" placeholder="Deine SSID">
+          <label for="ssid_input">SSID</label> 
+          <input id="ssid_input" type="text" placeholder="Deine SSID" required>
         </div>
         <div>
-          <label for="password_input">Passwort</label> <input id="password_input" type="password" placeholder="Dein Passwort">
+          <label for="password_input">Passwort</label> 
+          <input id="password_input" type="password" placeholder="Dein Passwort" required>
         </div>
-        <button type="button">Speichern</button>
+        <button type="submit" id="saveWifiButton">Speichern</button>
+        <div id="wifiMessage" class="message"></div>
       </form>
     </details>
   </main>
@@ -345,6 +481,25 @@ void handleRoot() {
           document.getElementById('wrms').textContent = d.wrms.toFixed(1);
           document.getElementById('arms').textContent = d.arms.toFixed(3);
           document.getElementById('wh').textContent   = d.wattH.toFixed(3);
+          
+          // Update WiFi status
+          if (d.wifi_mode) {
+            const statusText = d.wifi_mode === 'client' ? 'Verbunden' : 'Access Point';
+            const statusClass = 'status-' + d.wifi_mode;
+            
+            let wifiStatusHtml = 'WiFi: <span class="status-indicator ' + statusClass + '">' + statusText + '</span>';
+            
+            // Add IP and hostname info
+            if (d.ip) {
+              wifiStatusHtml += '<div class="wifi-info">IP: ' + d.ip;
+              if (d.hostname && d.wifi_mode === 'client') {
+                wifiStatusHtml += ' | <a href="http://' + d.hostname + '.local/" target="_blank">' + d.hostname + '.local</a>';
+              }
+              wifiStatusHtml += '</div>';
+            }
+            
+            document.getElementById('wifi-status').innerHTML = wifiStatusHtml;
+          }
         })
         .catch(err => console.error('Fetch /data fehlgeschlagen:', err));
     }
@@ -352,7 +507,7 @@ void handleRoot() {
     document.getElementById('resetEnergyButton').addEventListener('click', function() {
         if (confirm('Möchten Sie die Energiezähler (Wh und Joule) wirklich zurücksetzen?')) {
             fetch('/reset_energy', {
-                method: 'POST' // Specify POST method
+                method: 'POST'
             })
             .then(res => {
                 if (res.ok) {
@@ -368,6 +523,68 @@ void handleRoot() {
             });
         }
     });
+
+    // WiFi form handling
+    document.getElementById('wifiForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const ssid = document.getElementById('ssid_input').value;
+        const password = document.getElementById('password_input').value;
+        const messageDiv = document.getElementById('wifiMessage');
+        const saveButton = document.getElementById('saveWifiButton');
+        
+        if (!ssid || !password) {
+            showMessage('Bitte füllen Sie beide Felder aus.', 'error');
+            return;
+        }
+        
+        saveButton.disabled = true;
+        saveButton.textContent = 'Speichern...';
+        
+        const formData = new FormData();
+        formData.append('ssid', ssid);
+        formData.append('password', password);
+        
+        fetch('/save_wifi', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.text())
+        .then(data => {
+            showMessage('WiFi-Einstellungen gespeichert! Das Gerät wird sich neu verbinden.', 'success');
+            document.getElementById('ssid_input').value = '';
+            document.getElementById('password_input').value = '';
+            
+            // Inform user about potential reconnection and show current status
+            setTimeout(() => {
+                showMessage('Das Gerät versucht sich mit dem neuen WiFi zu verbinden. Die Verbindungsinformationen werden automatisch aktualisiert.', 'success');
+            }, 2000);
+            
+            // Force immediate data refresh to show updated connection info
+            setTimeout(() => {
+                fetchData();
+            }, 3000);
+        })
+        .catch(err => {
+            console.error('WiFi save error:', err);
+            showMessage('Fehler beim Speichern der WiFi-Einstellungen.', 'error');
+        })
+        .finally(() => {
+            saveButton.disabled = false;
+            saveButton.textContent = 'Speichern';
+        });
+    });
+    
+    function showMessage(text, type) {
+        const messageDiv = document.getElementById('wifiMessage');
+        messageDiv.textContent = text;
+        messageDiv.className = 'message ' + type;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
 
     // Initialer Ladevorgang
     fetchData();
@@ -386,7 +603,10 @@ void handleData() {
   json += "\"wattH\":"  + String(wattH,  3) + ",";
   json += "\"vrms\":"   + String(vrmsStore, 2) + ",";
   json += "\"arms\":"   + String(armsStore, 3) + ",";
-  json += "\"wrms\":"   + String(wrmsStore, 1);
+  json += "\"wrms\":"   + String(wrmsStore, 1) + ",";
+  json += "\"wifi_mode\":\"" + String(wifi_client_mode ? "client" : "ap") + "\",";
+  json += "\"ip\":\"" + (wifi_client_mode ? WiFi.localIP().toString() : WiFi.softAPIP().toString()) + "\",";
+  json += "\"hostname\":\"" + device_hostname + "\"";
   json += "}";
   
   server.send(200, "application/json", json);
@@ -397,13 +617,45 @@ void handleResetEnergy() {
   Serial.println("Resetting energy counters (Joule and Wh)...");
   joule = 0.0;
   wattH = 0.0;
-  // Optionally, you can also reset lastUpdateMillis if you want the calculation
-  // to behave as if it just started, but it's generally not needed for just resetting accumulated energy.
-  // lastUpdateMillis = millis(); 
   Serial.println("Energy counters have been reset.");
   server.send(200, "text/plain", "Energy counters reset successfully.");
 }
 
+// <<< New function to handle WiFi credential saving
+void handleSaveWiFi() {
+  if (server.method() != HTTP_POST) {
+    server.send(405, "text/plain", "Method Not Allowed");
+    return;
+  }
+  
+  String new_ssid = server.arg("ssid");
+  String new_password = server.arg("password");
+  
+  if (new_ssid.length() == 0 || new_password.length() == 0) {
+    server.send(400, "text/plain", "SSID and password are required");
+    return;
+  }
+  
+  // Save credentials to flash
+  saveWiFiCredentials(new_ssid, new_password);
+  
+  // Update current credentials
+  current_ssid = new_ssid;
+  current_password = new_password;
+  
+  server.send(200, "text/plain", "WiFi credentials saved successfully");
+  
+  // Attempt to reconnect in the background (non-blocking)
+  Serial.println("Attempting to connect to new WiFi credentials...");
+  
+  // Small delay then try to connect
+  delay(1000);
+  
+  WiFi.disconnect();
+  delay(1000);
+  
+  connectToWiFi();
+}
 
 // Function to handle requests for paths that are not found
 void handleNotFound() {
